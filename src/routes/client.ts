@@ -1,6 +1,6 @@
-import { Router } from "express"
-import authRoutes from "@/modules/client/auth/auth.routes"
-const router = Router()
+import authRoutes from "@/modules/client/auth/auth.routes";
+import { Router } from "express";
+const router = Router();
 
-router.use("/auth", authRoutes)
-export default router
+router.use("/auth", authRoutes);
+export default router;

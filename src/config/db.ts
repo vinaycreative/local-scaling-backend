@@ -1,7 +1,11 @@
-import { createClient } from "@supabase/supabase-js"
-import { Database } from "@/types/supabase"
-import { env } from "@/config/env"
+import { env } from "@/config/env";
+import { Database } from "@/types/supabase";
+import { createClient } from "@supabase/supabase-js";
 
-export const db = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
-  auth: { persistSession: false },
-})
+export const supabaseAdmin = createClient<Database>(
+  env.SUPABASE_URL,
+  env.SUPABASE_ANON_KEY,
+  {
+    auth: { persistSession: false },
+  }
+);

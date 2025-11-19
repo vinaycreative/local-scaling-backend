@@ -1,7 +1,7 @@
-import pino from "pino"
-import { env } from "./env"
+import pino from "pino";
+import { env } from "./env";
 
-const isDev = env.NODE_ENV === "development"
+const isDev = env.NODE_ENV === "development";
 
 export const logger = pino({
   transport: isDev
@@ -15,5 +15,5 @@ export const logger = pino({
       }
     : undefined,
   level: isDev ? "debug" : "info",
-  base: undefined, // removes pid, hostname (optional)
-})
+  base: undefined,
+});

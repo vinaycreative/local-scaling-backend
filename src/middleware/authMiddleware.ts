@@ -1,15 +1,34 @@
-import { Request, Response, NextFunction } from "express"
-import { verifyToken } from "@/utils/jwt"
-import { AppError } from "@/utils/appError"
-import { logger } from "@/config/logger"
+import { supabaseAdmin } from "@/config/db";
+import { COOKIE_NAME } from "@/modules/client/auth/auth.controller";
+import { NextFunction, Request, Response } from "express";
 
 // AuthMiddleware
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(" ")[1]
+export const authMiddleware = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const token = req.cookies[COOKIE_NAME];
+
   if (!token) {
-    return next(new AppError("Unauthorized", 401))
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: No token provided" });
   }
-  const decoded = verifyToken(token)
-  req.user = decoded
-  next()
-}
+
+  const { data, error } = await supabaseAdmin.auth.getUser(token);
+
+  if (error || !data.user) {
+    res.clearCookie(COOKIE_NAME);
+    return res
+      .status(401)
+      .json({ success: false, message: "Unauthorized: Invalid token" });
+  }
+
+  req.user = {
+    id: data.user.id,
+    role: data.user.app_metadata.role || "client",
+  };
+
+  next();
+};
