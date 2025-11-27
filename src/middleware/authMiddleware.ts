@@ -2,14 +2,23 @@ import { logError } from "@/config/logger";
 import { NextFunction, Request, Response } from "express";
 import { supabaseAdmin } from "../config/db";
 
+export interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email?: string;
+    role?: string;
+  };
+  token?: string;
+}
+
 /**
  * Middleware to protect routes.
  * 1. extracts Bearer token
  * 2. Verifies token with Supabase
  * 3. Attaches user to request object
  */
-export const protect = async (
-  req: Request,
+export const authMiddleware = async (
+  req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {

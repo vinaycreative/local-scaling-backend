@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/v1/client", v1Routes);
+app.use("/api/v1", v1Routes);
 
 // Global Error Handler
 app.use(errorHandler);
