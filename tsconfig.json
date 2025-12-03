@@ -11,9 +11,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node", "express"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "seed.js"],
   "ts-node": {
     "require": ["tsconfig-paths/register"]
   }

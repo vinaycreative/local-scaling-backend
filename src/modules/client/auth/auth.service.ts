@@ -3,17 +3,22 @@ import { signJwt } from "@/config/jwt";
 import { ExchangeSessionInput, LoginInput, SignUpInput } from "./auth.schema";
 
 export const loginService = async ({ email, password }: LoginInput) => {
+  console.log("info is ", { email, password });
   const { data, error } = await supabaseAdmin.auth.signInWithPassword({
     email,
     password,
   });
 
+  console.log("error is ", error?.message);
+
   if (error) throw new Error(error.message);
 
   const { session, user } = data;
+
+  console.log("user is ", user);
   if (!session || !user) throw new Error("Login failed: Invalid session data.");
 
-  const userRole = user.app_metadata.role || "client";
+  const userRole = user.app_metadata.role || "CLIENT";
   const name = user.user_metadata?.name || user.email?.split("@")[0] || "User";
 
   return {
