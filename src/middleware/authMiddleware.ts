@@ -11,29 +11,28 @@ export interface AuthRequest extends Request {
   token?: string;
 }
 
-/**
- * Middleware to protect routes.
- * 1. extracts Bearer token
- * 2. Verifies token with Supabase
- * 3. Attaches user to request object
- */
 export const authMiddleware = async (
   req: AuthRequest,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const authHeader = req.headers.authorization;
+    let token = "";
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else if (req.cookies && req.cookies.access_token) {
+      token = req.cookies.access_token;
+    }
+
+    if (!token) {
       res.status(401).json({
         success: false,
         message: "Unauthorized: No token provided",
       });
       return;
     }
-
-    const token = authHeader.split(" ")[1];
 
     const { data, error } = await supabaseAdmin.auth.getUser(token);
 
