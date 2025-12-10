@@ -1,7 +1,7 @@
 import z from "zod"
 
 export const businessFormSchema = z.object({
- company: z.string().min(1, "Company name is required"),
+  company: z.string().min(1, "Company name is required"),
   start_year: z.string().min(1, "Start year is required"),
   street_address: z.string().min(1, "Street address is required"),
   postal_code: z.string().min(1, "Postal code is required"),
@@ -11,14 +11,20 @@ export const businessFormSchema = z.object({
   vat_id: z.string().min(1, "VAT ID is required"),
   contact_name: z.string().min(1, "Contact name is required"),
   email: z.string().email("Invalid email"),
-  contact_number: z.string().min(1, "Contact number is required"),
-  whatsapp_number: z.string().optional(),
+  contact_number: z.string().regex(/^[6-9]\d{9}$/, "Invalid phone number"),
+  whatsapp_number: z
+    .string()
+    .regex(/^[6-9]\d{9}$/, "Invalid WhatsApp number")
+    .optional()
+    .or(z.literal("")),
   website: z.string().min(1).url("Invalid URL"),
-  facebook: z.string().optional(),
-  instagram: z.string().optional(),
-  twitter: z.string().optional(),
-  google_business_profile_link: z.string().optional(),
+  facebook: z.union([z.literal(""), z.url({ message: "Invalid Facebook URL" })]),
+  instagram: z.union([z.literal(""), z.url({ message: "Invalid Instagram URL" })]),
+  twitter: z.union([z.literal(""), z.url({ message: "Invalid Twitter URL" })]),
+  google_business_profile_link: z.union([
+    z.literal(""),
+    z.url({ message: "Invalid Google Business Profile URL" }),
+  ]),
 })
 
-export type BusinessFormData = z.infer<typeof businessFormSchema>;
-
+export type BusinessFormData = z.infer<typeof businessFormSchema>
