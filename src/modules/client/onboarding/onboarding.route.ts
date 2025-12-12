@@ -1,4 +1,5 @@
 import { Router } from "express"
+import clientRoutes from "./clients/clients.routes"
 import adsBudgetRoutes from "./ads-budget/ads-budget.routes"
 import brandingInfoRoutes from "./branding-info/branding-info.routes"
 import businessInfoRoutes from "./business-info/business-info-routes"
@@ -7,6 +8,7 @@ import websiteSetupRoutes from "./website-setup/website-setup.routes"
 
 const router = Router()
 
+router.use("/clients", clientRoutes)
 router.use("/ads-budget", adsBudgetRoutes)
 router.use("/branding-info", brandingInfoRoutes)
 router.use("/business-info", businessInfoRoutes)
