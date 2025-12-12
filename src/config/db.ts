@@ -62,7 +62,7 @@ export const createUserClient = (accessToken: string) => {
 
 export const db = createClient<Database>(
   process.env.SUPABASE_URL as string,
-  process.env.SUPABASE_ANON_KEY as string,
+  process.env.SUPABASE_SERVICE_ROLE_KEY as string,
   {
     auth: { persistSession: false },
   }

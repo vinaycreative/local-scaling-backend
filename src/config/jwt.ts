@@ -1,7 +1,6 @@
 type JwtHeader = { alg: "HS256"; typ: "JWT" };
 
 export type JwtPayload = {
-  sub: string;
   role: string;
   name: string;
   email: string;
