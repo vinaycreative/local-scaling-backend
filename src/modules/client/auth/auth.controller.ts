@@ -4,7 +4,12 @@ import { asyncHandler } from "@/utils/asyncHandler"
 import { sendSuccess } from "@/utils/response"
 import { Request, Response } from "express"
 import { exchangeSessionSchema, loginSchema, signUpSchema } from "./auth.schema"
-import { exchangeSessionService, loginService, logoutService, signUpService } from "./auth.service"
+import {
+  getLoggedInUserService,
+  loginServiceWithEmailPassword,
+  logoutService,
+  signUpService,
+} from "./auth.service"
 
 export const COOKIE_NAME = "access_token"
 
@@ -16,23 +21,34 @@ const getCookieOptions = () => ({
   sameSite: (env.NODE_ENV === "production" ? "none" : "lax") as "none" | "lax",
 })
 
-export const getLoggedInUserController = asyncHandler(async (req: AuthRequest, res: Response) => {
-  return sendSuccess(res, "User data fetched successfully", {
-    user: req.user,
-  })
+export const getLoggedInUserController = asyncHandler(async (req: Request, res: Response) => {
+  const user_id = req.user?.id || ""
+  const result = await getLoggedInUserService(user_id)
+  return sendSuccess(res, "User data fetched successfully", result.user)
 })
+
+// export const loginUserController = asyncHandler(async (req: Request, res: Response) => {
+//   const { email, password } = await loginSchema.parseAsync(req.body)
+
+//   const data = await loginService({ email, password })
+
+//   res.cookie(COOKIE_NAME, data?.token, {
+//     ...getCookieOptions(),
+//     maxAge: 30 * 24 * 60 * 60 * 1000,
+//   })
+
+//   return sendSuccess(res, "Login successful", data)
+// })
 
 export const loginUserController = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = await loginSchema.parseAsync(req.body)
-
-  const data = await loginService({ email, password })
-
-  res.cookie(COOKIE_NAME, data?.token, {
+  const result = await loginServiceWithEmailPassword({ email, password })
+  res.cookie(COOKIE_NAME, result.token, {
     ...getCookieOptions(),
     maxAge: 30 * 24 * 60 * 60 * 1000,
   })
 
-  return sendSuccess(res, "Login successful", data)
+  return sendSuccess(res, "Login successful", result.user)
 })
 
 export const devSignUpController = asyncHandler(async (req: Request, res: Response) => {
@@ -54,22 +70,6 @@ export const devSignUpController = asyncHandler(async (req: Request, res: Respon
   return sendSuccess(res, "Login successful")
 })
 
-export const devLoginController = asyncHandler(async (req: Request, res: Response) => {
-  const email = "abhay@webbywolf.com"
-  const password = "abhay-webbywolf-password"
-
-  const { token, user } = await loginService({ email, password })
-
-  console.log("token is ", token)
-
-  res.cookie(COOKIE_NAME, token, {
-    ...getCookieOptions(),
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  })
-
-  return sendSuccess(res, "Dev Login successful", { user })
-})
-
 export const signUpUserController = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = await signUpSchema.parseAsync(req.body)
 
@@ -80,19 +80,6 @@ export const signUpUserController = asyncHandler(async (req: Request, res: Respo
     message: "User registered successfully. Please check email for verification.",
     data: result,
   })
-})
-
-export const exchangeSessionController = asyncHandler(async (req: Request, res: Response) => {
-  const { accessToken } = await exchangeSessionSchema.parseAsync(req.body)
-
-  const { token, user } = await exchangeSessionService({ accessToken })
-
-  res.cookie(COOKIE_NAME, token, {
-    ...getCookieOptions(),
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  })
-
-  return sendSuccess(res, "Session successfully exchanged", { user })
 })
 
 export const logoutUserController = asyncHandler(async (req: Request, res: Response) => {

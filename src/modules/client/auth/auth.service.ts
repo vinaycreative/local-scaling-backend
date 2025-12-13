@@ -1,104 +1,41 @@
 import { db, supabaseAdmin } from "@/config/db"
-import { signJwt } from "@/config/jwt"
+import { generateToken } from "@/config/jwt"
 import { ExchangeSessionInput, LoginInput, SignUpInput } from "./auth.schema"
-import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
 import { AppError } from "@/utils/appError"
 
-export const loginService = async ({ email, password }: LoginInput) => {
-  try {
-    // Validate input
-    if (!email || !password) {
-      throw new Error("Email and password are required")
-    }
-
-    const normalizedEmail = email.toLowerCase().trim()
-
-    const { data: user, error: userError } = await db
-      .from("users")
-      .select(
-        `
-          *, role:roles(id,name,permissions)
-        `
-      )
-      .eq("email", normalizedEmail)
-      .single()
-
-    if (userError) {
-      console.error("Supabase error:", userError)
-      // Don't reveal if user exists or not for security
-      throw new AppError("Invalid credentials")
-    }
-
-    if (!user) {
-      throw new AppError("Invalid credentials")
-    }
-
-    console.log(`User found: ${user.id}, has password: ${!!user.password}`)
-
-    // Verify password
-    if (!user.password) {
-      console.error("User has no password hash")
-      throw new Error("Invalid credentials")
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password)
-
-    if (!isPasswordValid) {
-      console.log("Password mismatch for user:", user.id)
-      throw new AppError("Invalid credentials")
-    }
-
-    console.log("Password validated successfully for user:", user.id)
-
-    // Generate JWT token
-    if (!process.env.JWT_SECRET) {
-      throw new AppError("JWT_SECRET is not configured")
-    }
-
-    const tokenPayload = {
-      id: user.id,
-      role: user?.role?.name,
-      permissions: user?.role?.permissions,
-    }
-
-    const token = jwt.sign(
-      {
-        ...tokenPayload,
-      },
-      process.env.JWT_SECRET!,
-      { expiresIn: "30d" }
+export const loginServiceWithEmailPassword = async ({ email, password }: LoginInput) => {
+  const { data: user, error: userError } = await db
+    .from("users")
+    .select(
+      `
+      *, role:roles(id,name,permissions)
+    `
     )
+    .eq("email", email)
+    .single()
 
-    const { password: _, ...userWithoutPassword } = user
+  if (userError || !user?.password) {
+    throw new AppError("Invalid email or password")
+  }
 
-    const response = {
-      token: token,
-      user: {
-        id: user.id,
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
-      },
-      role: user.role?.name,
-      permissions: user.role?.permissions,
-    }
+  const isPasswordValid = await bcrypt.compare(password, user?.password)
+  if (!isPasswordValid) {
+    throw new AppError("Invalid email or password")
+  }
 
-    console.log(`Login successful for user: ${user.id}`)
-    return response
-  } catch (error: any) {
-    console.error("Login service error:", error.message)
+  const userPayload = {
+    id: user.id || "",
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
+    email: user.email || "",
+    role: user?.role?.name || "",
+  }
+  const token = generateToken(userPayload, "30d")
 
-    // Re-throw with appropriate message
-    if (error.message.includes("credentials") || error.message.includes("Invalid")) {
-      throw new AppError("Invalid credentials")
-    }
-
-    if (error.message.includes("JWT_SECRET")) {
-      throw new AppError("Server configuration error")
-    }
-
-    throw new Error(error.message || "Login failed")
+  return {
+    token: token,
+    user: userPayload,
   }
 }
 
@@ -119,33 +56,30 @@ export const signUpService = async ({ email, password }: SignUpInput) => {
   }
 }
 
-export const exchangeSessionService = async ({ accessToken }: ExchangeSessionInput) => {
-  const {
-    data: { user },
-    error,
-  } = await supabaseAdmin.auth.getUser(accessToken)
+export const getLoggedInUserService = async (user_id: string) => {
+  const { data: user, error: userError } = await db
+    .from("users")
+    .select(
+      `
+    *, role:roles(id,name,permissions)
+  `
+    )
+    .eq("id", user_id)
+    .single()
 
-  if (error || !user) {
-    throw new Error("Invalid or expired external session token.")
+  if (userError || !user?.password) {
+    throw new AppError("Invalid email or password")
   }
 
-  const customPayload = {
-    sub: user.id,
+  const userPayload = {
+    id: user.id || "",
+    first_name: user.first_name || "",
+    last_name: user.last_name || "",
     email: user.email || "",
-    role: (user.user_metadata?.role as string) || "Client",
-    name: (user.user_metadata?.full_name as string) || "User",
+    role: user?.role?.name || "",
   }
-
-  const customJwt = await signJwt(customPayload)
-
   return {
-    token: customJwt,
-    user: {
-      id: user.id,
-      email: user.email,
-      role: customPayload.role,
-      name: customPayload.name,
-    },
+    user: userPayload,
   }
 }
 
