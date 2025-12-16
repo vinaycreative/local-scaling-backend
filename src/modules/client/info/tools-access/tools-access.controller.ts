@@ -13,7 +13,7 @@ export const getToolsAccessController = asyncHandler(async (req: AuthRequest, re
     throw new Error("Unauthorized: User ID missing")
   }
 
-  const result = await getToolsAccessService("userId")
+  const result = await getToolsAccessService(userId)
 
   return sendSuccess(res, "Website setup retrieved successfully", result)
 })

@@ -4,5 +4,5 @@ import { getToolsAccessController, saveToolsAccessController } from "./tools-acc
 const router = Router()
 
 router.get("/", getToolsAccessController)
-router.post("/create", saveToolsAccessController)
+router.post("/", saveToolsAccessController)
 export default router
