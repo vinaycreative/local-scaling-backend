@@ -96,7 +96,11 @@ export const successPaymentService = async (id: string) => {
 export const getClientProfilePageService = async (id: string) => {
   const { data: clientData, error: clientError } = await db
     .from("users")
-    .select("*")
+    .select(
+      `
+    *, role:roles(id,name,permissions)
+  `
+    )
     .eq("client_lead_id", id)
     .single()
 
@@ -133,6 +137,7 @@ export const getClientProfilePageService = async (id: string) => {
     .maybeSingle()
 
   return {
+    user: clientData,
     business_info,
     branding_info,
     tools_access: toolsAccessData,
