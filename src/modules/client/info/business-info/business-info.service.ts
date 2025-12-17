@@ -19,12 +19,11 @@ export const getBusinessInfoService = async (userId: string) => {
 }
 
 export const saveBusinessInfoService = async (userId: string, data: BusinessFormData) => {
-  const { twitter, ...rest } = data
+  const { ...rest } = data
 
   const payload = {
     ...rest,
     user_id: userId,
-    x: twitter,
   }
 
   const { data: businessInfoData, error: businessError } = await db
