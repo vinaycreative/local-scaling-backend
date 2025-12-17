@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      ads_budget: {
+      ads_budget_location: {
         Row: {
           client_id: string | null
           created_at: string | null
@@ -45,55 +45,71 @@ export type Database = {
           services_provided?: string[] | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ads_budget_location_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       branding_assets: {
         Row: {
-          brand_color_primary: string | null
-          brand_color_secondary: string | null
-          ceo_intro_video_url: string | null
-          client_id: string | null
-          company_logo_url: string | null
+          ceo_video_url: string | null
           created_at: string | null
           font_link: string | null
           id: string
+          logo_url: string | null
+          primary_brand_color: string | null
+          secondary_brand_color: string | null
           team_members: Json | null
-          team_photos_url: string[] | null
-          total_team_members: number | null
+          team_photo_urls: string[] | null
           updated_at: string | null
-          video_testimonials_urls: string[] | null
+          user_id: string | null
+          video_creation_option: string | null
+          video_testimonial_url: string | null
         }
         Insert: {
-          brand_color_primary?: string | null
-          brand_color_secondary?: string | null
-          ceo_intro_video_url?: string | null
-          client_id?: string | null
-          company_logo_url?: string | null
+          ceo_video_url?: string | null
           created_at?: string | null
           font_link?: string | null
           id?: string
+          logo_url?: string | null
+          primary_brand_color?: string | null
+          secondary_brand_color?: string | null
           team_members?: Json | null
-          team_photos_url?: string[] | null
-          total_team_members?: number | null
+          team_photo_urls?: string[] | null
           updated_at?: string | null
-          video_testimonials_urls?: string[] | null
+          user_id?: string | null
+          video_creation_option?: string | null
+          video_testimonial_url?: string | null
         }
         Update: {
-          brand_color_primary?: string | null
-          brand_color_secondary?: string | null
-          ceo_intro_video_url?: string | null
-          client_id?: string | null
-          company_logo_url?: string | null
+          ceo_video_url?: string | null
           created_at?: string | null
           font_link?: string | null
           id?: string
+          logo_url?: string | null
+          primary_brand_color?: string | null
+          secondary_brand_color?: string | null
           team_members?: Json | null
-          team_photos_url?: string[] | null
-          total_team_members?: number | null
+          team_photo_urls?: string[] | null
           updated_at?: string | null
-          video_testimonials_urls?: string[] | null
+          user_id?: string | null
+          video_creation_option?: string | null
+          video_testimonial_url?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "branding_assets_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       branding_content: {
         Row: {
@@ -145,69 +161,80 @@ export type Database = {
           address: string | null
           city: string | null
           company_name: string | null
-          company_start_year: string | null
           contact_email: string | null
           contact_name: string | null
           contact_number: string | null
           country: string | null
           created_at: string
-          currnet_website_url: string | null
-          fecbook_url: string | null
-          google_profile_link: string | null
+          facebook: string | null
+          google_business_profile_link: string | null
           id: string
-          instagram_url: string | null
+          instagram: string | null
           postal_code: string | null
+          start_year: string | null
           state: string | null
           updatd_at: string
+          user_id: string
           vat_id: string | null
-          wabtsapp_number: string | null
+          website: string | null
+          whatsapp_number: string | null
           x: string | null
         }
         Insert: {
           address?: string | null
           city?: string | null
           company_name?: string | null
-          company_start_year?: string | null
           contact_email?: string | null
           contact_name?: string | null
           contact_number?: string | null
           country?: string | null
           created_at?: string
-          currnet_website_url?: string | null
-          fecbook_url?: string | null
-          google_profile_link?: string | null
+          facebook?: string | null
+          google_business_profile_link?: string | null
           id?: string
-          instagram_url?: string | null
+          instagram?: string | null
           postal_code?: string | null
+          start_year?: string | null
           state?: string | null
           updatd_at?: string
+          user_id: string
           vat_id?: string | null
-          wabtsapp_number?: string | null
+          website?: string | null
+          whatsapp_number?: string | null
           x?: string | null
         }
         Update: {
           address?: string | null
           city?: string | null
           company_name?: string | null
-          company_start_year?: string | null
           contact_email?: string | null
           contact_name?: string | null
           contact_number?: string | null
           country?: string | null
           created_at?: string
-          currnet_website_url?: string | null
-          fecbook_url?: string | null
-          google_profile_link?: string | null
+          facebook?: string | null
+          google_business_profile_link?: string | null
           id?: string
-          instagram_url?: string | null
+          instagram?: string | null
           postal_code?: string | null
+          start_year?: string | null
           state?: string | null
           updatd_at?: string
+          user_id?: string
           vat_id?: string | null
-          wabtsapp_number?: string | null
+          website?: string | null
+          whatsapp_number?: string | null
           x?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "business_information_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       client_leads: {
         Row: {
@@ -538,7 +565,15 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "website_setup_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

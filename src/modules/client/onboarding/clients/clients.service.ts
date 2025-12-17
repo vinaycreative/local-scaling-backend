@@ -24,7 +24,7 @@ export const createNewClientsService = async (userId: string, payload: ClientsFo
   }
 
   const { data, error } = await db
-    .from("ads_budget")
+    .from("client_leads")
     .upsert(dataToSave, { onConflict: "client_id" })
     .select()
     .single()
