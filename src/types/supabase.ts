@@ -16,31 +16,31 @@ export type Database = {
     Tables: {
       ads_budget_location: {
         Row: {
+          budget: number | null
           client_id: string | null
           created_at: string | null
           currency: string | null
           id: string
-          monthly_budget: number | null
           seo_locations: string[] | null
           services_provided: string[] | null
           updated_at: string | null
         }
         Insert: {
+          budget?: number | null
           client_id?: string | null
           created_at?: string | null
           currency?: string | null
           id?: string
-          monthly_budget?: number | null
           seo_locations?: string[] | null
           services_provided?: string[] | null
           updated_at?: string | null
         }
         Update: {
+          budget?: number | null
           client_id?: string | null
           created_at?: string | null
           currency?: string | null
           id?: string
-          monthly_budget?: number | null
           seo_locations?: string[] | null
           services_provided?: string[] | null
           updated_at?: string | null
@@ -49,7 +49,7 @@ export type Database = {
           {
             foreignKeyName: "ads_budget_location_client_id_fkey"
             columns: ["client_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -413,30 +413,30 @@ export type Database = {
       tools_access: {
         Row: {
           created_at: string
-          google_ads: boolean | null
-          google_analytics_4: boolean | null
-          google_search_console: boolean | null
-          google_tag_manager: boolean | null
+          ga4_access_granted: boolean | null
+          google_ads_access_granted: boolean | null
+          google_search_console_access_granted: boolean | null
+          gtm_access_granted: boolean | null
           id: string
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
-          google_ads?: boolean | null
-          google_analytics_4?: boolean | null
-          google_search_console?: boolean | null
-          google_tag_manager?: boolean | null
+          ga4_access_granted?: boolean | null
+          google_ads_access_granted?: boolean | null
+          google_search_console_access_granted?: boolean | null
+          gtm_access_granted?: boolean | null
           id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
-          google_ads?: boolean | null
-          google_analytics_4?: boolean | null
-          google_search_console?: boolean | null
-          google_tag_manager?: boolean | null
+          ga4_access_granted?: boolean | null
+          google_ads_access_granted?: boolean | null
+          google_search_console_access_granted?: boolean | null
+          gtm_access_granted?: boolean | null
           id?: string
           updated_at?: string
           user_id?: string
@@ -445,7 +445,7 @@ export type Database = {
           {
             foreignKeyName: "tools_access_user_id_fkey"
             columns: ["user_id"]
-            isOneToOne: false
+            isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
           },
@@ -453,6 +453,7 @@ export type Database = {
       }
       users: {
         Row: {
+          client_lead_id: string | null
           created_at: string
           email: string | null
           first_name: string | null
@@ -463,6 +464,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          client_lead_id?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -473,6 +475,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          client_lead_id?: string | null
           created_at?: string
           email?: string | null
           first_name?: string | null
@@ -483,6 +486,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "users_client_lead_id_fkey"
+            columns: ["client_lead_id"]
+            isOneToOne: false
+            referencedRelation: "client_leads"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "users_role_fkey"
             columns: ["role"]
