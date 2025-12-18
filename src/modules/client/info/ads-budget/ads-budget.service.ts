@@ -17,6 +17,7 @@ export const getAdsBudgetService = async (userId: string) => {
 export const saveAdsBudgetService = async (userId: string, payload: AdsBudgetForm) => {
   const dataToSave = {
     ...payload,
+    budget: Number(payload.budget),
     client_id: userId,
   }
 
