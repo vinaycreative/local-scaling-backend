@@ -404,6 +404,63 @@ export type Database = {
         }
         Relationships: []
       }
+      tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          files: string[] | null
+          id: string
+          priority: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          files?: string[] | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          files?: string[] | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tickets_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tickets_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       tools_access: {
         Row: {
           created_at: string
