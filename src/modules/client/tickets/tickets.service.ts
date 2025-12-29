@@ -1,10 +1,6 @@
 import { db } from "@/config/db"
 import { CreateTicketPayload, TicketFilters } from "./tickets.types"
-
-export const getTicketsService = async (
-  userId: string,
-  filters: TicketFilters
-) => {
+export const getTicketsService = async (userId: string, filters: TicketFilters) => {
   console.log("🚀 ~ getTicketsService ~ filters:", filters)
   const page = filters.page ?? 1
   const perPage = filters.perPage ?? 10
@@ -14,12 +10,25 @@ export const getTicketsService = async (
 
   let query = db
     .from("tickets")
-    .select("*", { count: "exact" })
+    .select(
+      `
+    *,
+    created_by (
+      first_name,
+      last_name
+    ),
+    assigned_to (
+      first_name,
+      last_name
+    )
+  `,
+      { count: "exact" }
+    )
     .eq("created_by", userId)
 
   // TEXT SEARCH
-  if (filters.title) {
-    query = query.ilike("title", `%${filters.title}%`)
+  if (filters.title?.trim()) {
+    query = query.ilike("title", `%${filters.title.trim()}%`)
   }
 
   if (filters.subject) {
@@ -45,11 +54,11 @@ export const getTicketsService = async (
 
   // DATE FILTER
   if (filters.created_at) {
-    query = query.gte(
-      "created_at",
-      new Date(Number(filters.created_at)).toISOString()
-    )
+    query = query.gte("created_at", new Date(Number(filters.created_at)).toISOString())
   }
+
+  // ORDERING (should come after filters but before pagination)
+  query = query.order("created_at", { ascending: false })
 
   // PAGINATION
   query = query.range(from, to)

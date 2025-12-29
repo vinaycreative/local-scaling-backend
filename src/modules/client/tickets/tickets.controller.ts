@@ -11,8 +11,9 @@ export const getTicketsController = asyncHandler(async (req: AuthRequest, res: R
     return res.status(401).json({ message: "Unauthorized" })
   }
   const userId = req.user.id
-  console.log("🚀 ~ req.query:", req.query)
   const filters: TicketFilters = {
+    page: Number(req.query.page || 1) as number | undefined,
+    perPage: Number(req.query.perPage || 10) as number | undefined,
     subject: req.query.subject as string | undefined,
     category: getQueryArray(req.query, "category"),
     priority: req.query.priority as string | undefined,
