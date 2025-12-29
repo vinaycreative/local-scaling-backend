@@ -1,12 +1,24 @@
 import { db } from "@/config/db"
-import { TicketFilters } from "./tickets.types"
+import { CreateTicketPayload, TicketFilters } from "./tickets.types"
 
-export const getTicketsService = async (userId: string, filters: TicketFilters) => {
-  let query = db.from("tickets").select("*")
-  // console.log("🚀 ~ getTicketsService ~ query:", query)
+export const getTicketsService = async (
+  userId: string,
+  filters: TicketFilters
+) => {
+  console.log("🚀 ~ getTicketsService ~ filters:", filters)
+  const page = filters.page ?? 1
+  const perPage = filters.perPage ?? 10
 
-  // TEXT SEARCH (subject)
-  if (filters.subject) {
+  const from = (page - 1) * perPage
+  const to = from + perPage - 1
+
+  let query = db
+    .from("tickets")
+    .select("*", { count: "exact" })
+    .eq("created_by", userId)
+
+  // TEXT SEARCH
+  if (filters.title) {
     query = query.ilike("title", `%${filters.title}%`)
   }
 
@@ -20,23 +32,46 @@ export const getTicketsService = async (userId: string, filters: TicketFilters) 
   }
 
   if (filters.priority) {
-    query = query.eq("priority", filters.priority)
+    Array.isArray(filters.priority)
+      ? (query = query.in("priority", filters.priority))
+      : (query = query.eq("priority", filters.priority))
   }
 
   if (filters.status) {
-    query = query.eq("status", filters.status)
+    Array.isArray(filters.status)
+      ? (query = query.in("status", filters.status))
+      : (query = query.eq("status", filters.status))
   }
 
-  // DATE FILTER (created_at timestamp)
+  // DATE FILTER
   if (filters.created_at) {
-    query = query.gte("created_at", new Date(Number(filters.created_at)).toISOString())
+    query = query.gte(
+      "created_at",
+      new Date(Number(filters.created_at)).toISOString()
+    )
   }
 
-  const { data, error } = await query
+  // PAGINATION
+  query = query.range(from, to)
+
+  const { data, error, count } = await query
 
   if (error) {
     throw error
   }
+
+  return {
+    data,
+    page,
+    perPage,
+    total: count ?? 0,
+    totalPages: count ? Math.ceil(count / perPage) : 0,
+  }
+}
+
+export const createTicketsService = async (userId: string, payload: any) => {
+  const { data, error } = await db.from("tickets").insert(payload)
+  console.log("🚀 ~ createTicketsService ~ error:", error)
 
   return data
 }
