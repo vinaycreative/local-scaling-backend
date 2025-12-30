@@ -14,7 +14,7 @@ export const getTicketsController = asyncHandler(async (req: AuthRequest, res: R
   const filters: TicketFilters = {
     page: Number(req.query.page || 1) as number | undefined,
     perPage: Number(req.query.perPage || 10) as number | undefined,
-    subject: req.query.subject as string | undefined,
+    title: req.query.title as string | undefined,
     category: getQueryArray(req.query, "category"),
     priority: req.query.priority as string | undefined,
     status: req.query.status as string | undefined,
