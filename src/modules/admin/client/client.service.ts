@@ -1,15 +1,97 @@
 import { db } from "@/config/db"
 import { AppError } from "@/utils/appError"
-import { ClientLeadInput } from "./client.type"
+import { ClientLeadInput, GetClientsFilters } from "./client.type"
 import bcrypt from "bcryptjs"
 import { sendWelcomeEmail, welcomeEmailWithPaymentLink } from "./client.utils"
 
-export const getClientsService = async (user_id: string) => {
-  const { data: clients, error } = await db.from("client_leads").select("*")
-  if (error) {
-    throw new AppError(`Failed to fetch client leads: ${error.message}`, 500)
+export const getClientsService = async (userId: string, filters?: GetClientsFilters) => {
+  const page = filters?.page ?? 1
+  const perPage = filters?.perPage ?? 10
+
+  const from = (page - 1) * perPage
+  const to = from + perPage - 1
+
+  let query = db.from("client_leads").select("*", { count: "exact" })
+
+  // -------- TEXT FILTERS (ILIKE) --------
+  if (filters?.company_name) {
+    query = query.ilike("company_name", `%${filters.company_name}%`)
   }
-  return clients ?? []
+
+  if (filters?.name) {
+    query = query.ilike("name", `%${filters.name}%`)
+  }
+
+  if (filters?.email) {
+    query = query.ilike("email", `%${filters.email}%`)
+  }
+
+  if (filters?.vat_id) {
+    query = query.ilike("vat_id", `%${filters.vat_id}%`)
+  }
+
+  if (filters?.address) {
+    query = query.ilike("address", `%${filters.address}%`)
+  }
+
+  if (filters?.postal_code) {
+    query = query.ilike("postal_code", `%${filters.postal_code}%`)
+  }
+
+  if (filters?.city) {
+    query = query.ilike("city", `%${filters.city}%`)
+  }
+
+  if (filters?.state) {
+    query = query.ilike("state", `%${filters.state}%`)
+  }
+
+  if (filters?.country) {
+    query = query.ilike("country", `%${filters.country}%`)
+  }
+
+  // -------- EXACT MATCH FILTERS --------
+  if (filters?.monthly_payment_excluding_taxes) {
+    query = query.eq("monthly_payment_excluding_taxes", filters.monthly_payment_excluding_taxes)
+  }
+
+  if (filters?.payment_status) {
+    query = query.eq("payment_status", filters.payment_status)
+  }
+
+  if (filters?.payment_link) {
+    query = query.eq("payment_link", filters.payment_link)
+  }
+
+  if (filters?.status) {
+    query = query.eq("status", filters.status)
+  }
+
+  // -------- DATE FILTERS --------
+  if (filters?.created_at) {
+    query = query.gte("created_at", filters.created_at)
+  }
+
+  if (filters?.updated_at) {
+    query = query.gte("updated_at", filters.updated_at)
+  }
+
+  // -------- PAGINATION --------
+  query = query.range(from, to)
+
+  const { data, error, count } = await query
+
+  if (error) {
+    throw error
+  }
+
+  return {
+    data: data ?? [],
+    page,
+    perPage,
+    total: count ?? 0,
+    totalPages: count ? Math.ceil(count / perPage) : 0,
+  }
 }
 
 export const createClientService = async (user_id: string, data: ClientLeadInput) => {
