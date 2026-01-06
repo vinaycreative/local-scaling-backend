@@ -7,8 +7,9 @@
   "type": "commonjs",
   "main": "dist/server.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node -r ./register-paths.js dist/server.js",
     "build": "tsc",
+    "build:full": "tsc && npx tsc-alias",
     "dev": "nodemon --exec ts-node -r tsconfig-paths/register src/server.ts"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
     "@types/nodemailer": "^7.0.4",
     "nodemon": "^3.1.11",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
     "typescript": "^5.9.3"
   },
   "dependencies": {
