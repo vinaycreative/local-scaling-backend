@@ -1,6 +1,5 @@
 import { db } from "@/config/db"
 import { AdsBudgetForm } from "./ads-budget.schema"
-import { AppError } from "@/utils/appError"
 
 export const getAdsBudgetService = async (userId: string) => {
   const { data, error } = await db
@@ -11,7 +10,7 @@ export const getAdsBudgetService = async (userId: string) => {
 
   if (error && error.code !== "PGRST116") {
     console.error(`[getAdsBudgetService]:`, error.message)
-    throw new AppError("Failed to fetch Ads Budget", 500)
+    throw new Error("Failed to fetch Ads Budget")
   }
 
   return data ?? null
@@ -19,11 +18,9 @@ export const getAdsBudgetService = async (userId: string) => {
 
 export const saveAdsBudgetService = async (userId: string, payload: AdsBudgetForm) => {
   const dataToSave = {
-    budget: Number(payload.budget),
-    currency: payload.currency,
-    seo_locations: payload.locations,
-    services_provided: payload.services,
+    ...payload,
     client_id: userId,
+    budget: Number(payload.budget),
   }
 
   const { data, error } = await db
@@ -34,7 +31,7 @@ export const saveAdsBudgetService = async (userId: string, payload: AdsBudgetFor
 
   if (error) {
     console.error("[saveAdsBudgetService]:", error.message)
-    throw new AppError("Failed to save Ads Budget", 500)
+    throw new Error("Failed to save Ads Budget")
   }
 
   return data

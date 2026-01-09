@@ -727,7 +727,7 @@ export type Database = {
     }
     Enums: {
       integration_provider: "google"
-      integration_status: "pending" | "verified" | "revoked" | "error"
+      integration_status: "pending" | "connected" | "revoked" | "error"
       integration_tool: "google_ads" | "ga4" | "gtm" | "search_console"
     }
     CompositeTypes: {
@@ -857,7 +857,7 @@ export const Constants = {
   public: {
     Enums: {
       integration_provider: ["google"],
-      integration_status: ["pending", "verified", "revoked", "error"],
+      integration_status: ["pending", "connected", "revoked", "error"],
       integration_tool: ["google_ads", "ga4", "gtm", "search_console"],
     },
   },

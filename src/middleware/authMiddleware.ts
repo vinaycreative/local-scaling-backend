@@ -8,8 +8,6 @@ import { JwtPayload } from "@/config/jwt"
 
 export interface AuthRequest extends Request {
   user?: JwtPayload
-  file?: Express.Multer.File
-  files?: Express.Multer.File[]
 }
 
 export const authMiddleware = (req: Request, _res: Response, next: NextFunction): void => {
