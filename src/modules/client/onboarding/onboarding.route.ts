@@ -3,7 +3,7 @@ import clientRoutes from "./clients/clients.routes"
 import adsBudgetRoutes from "./ads-budget/ads-budget.routes"
 // import brandingInfoRoutes from "../info/branding-info/branding-info.route"
 import businessInfoRoutes from "./business-info/business-info-routes"
-import toolsAccessRoutes from "./tools-access/tools-access.routes"
+import toolsAccessRoutes from "../integrations/integrations.routes"
 import websiteSetupRoutes from "./website-setup/website-setup.routes"
 
 const router = Router()
