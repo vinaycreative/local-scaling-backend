@@ -23,13 +23,11 @@ export async function listGa4Properties(tokens: {
     version: "v1beta",
     auth: authClient,
   })
-  console.log("authClient: ", authClient)
 
   // First, list all accounts
   const accountsResponse = await analyticsAdmin.accounts.list({
     pageSize: 200,
   })
-  console.log("accountsResponse: ", accountsResponse)
 
   const accounts = accountsResponse.data.accounts || []
 

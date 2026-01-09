@@ -1,5 +1,5 @@
 import { google } from "googleapis"
-import { GA4_SCOPES } from "./google.scopes"
+import { GOOGLE_SCOPES } from "./google.scopes"
 import { GoogleOAuthTokens } from "./google.types"
 
 const oauth2Client = new google.auth.OAuth2(
@@ -16,7 +16,7 @@ export function generateGa4AuthUrl(): string {
   return oauth2Client.generateAuthUrl({
     access_type: "offline",
     prompt: "consent",
-    scope: GA4_SCOPES,
+    scope: GOOGLE_SCOPES.GA4,
   })
 }
 
