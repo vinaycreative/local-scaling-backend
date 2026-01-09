@@ -14,20 +14,24 @@ export async function listGa4Properties(tokens: {
   access_token: string
   refresh_token?: string
 }): Promise<Ga4Property[]> {
+  console.log("tokens: ", tokens)
+  console.log("access_token: ", tokens.access_token)
+  console.log("refresh_token: ", tokens.refresh_token)
+
   const authClient = setOAuthCredentials(tokens)
-  console.log("authClient: ", authClient)
   const analyticsAdmin = google.analyticsadmin({
     version: "v1beta",
     auth: authClient,
   })
+  console.log("authClient: ", authClient)
 
   // First, list all accounts
   const accountsResponse = await analyticsAdmin.accounts.list({
     pageSize: 200,
   })
+  console.log("accountsResponse: ", accountsResponse)
 
   const accounts = accountsResponse.data.accounts || []
-  console.log("Found accounts:", accounts.length)
 
   // Then, list properties for each account
   const allProperties: Ga4Property[] = []
@@ -42,7 +46,7 @@ export async function listGa4Properties(tokens: {
       })
 
       const properties = propertiesResponse.data.properties || []
-      console.log(`Found ${properties.length} properties for account ${account.name}`)
+      console.log("properties: ", properties)
 
       const mappedProperties = properties.map((property) => ({
         propertyId: property.name?.replace("properties/", "") || "",

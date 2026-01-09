@@ -48,3 +48,18 @@ export function setOAuthCredentials(tokens: { access_token: string; refresh_toke
   oauth2Client.setCredentials(tokens)
   return oauth2Client
 }
+
+/**
+ * Generic Google OAuth URL generator (used by all tools)
+ */
+export function generateGoogleAuthUrl(params: {
+  scopes: readonly string[]
+  state?: string
+}): string {
+  return oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    prompt: "consent",
+    scope: [...params.scopes],
+    state: params.state,
+  })
+}
